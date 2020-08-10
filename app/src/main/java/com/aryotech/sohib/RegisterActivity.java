@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,10 +35,10 @@ public class RegisterActivity extends AppCompatActivity {
     Button btnRegister;
     TextView txt_login;
     String userId;
+    ProgressBar progressBar;
 
     FirebaseAuth fbAuth;
     DatabaseReference dbRef;
-    ProgressDialog progressDialog;
     FirebaseFirestore fbFirestore;
 
     @Override
@@ -51,11 +52,12 @@ public class RegisterActivity extends AppCompatActivity {
         password = findViewById(R.id.et_pass);
         btnRegister = findViewById(R.id.btn_regist_activity);
         txt_login = findViewById(R.id.txt_login);
+        progressBar = findViewById(R.id.progbar);
 
         fbFirestore = FirebaseFirestore.getInstance();
 
-       /* if (fbAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        /*if (fbAuth.getCurrentUser() != null){
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         }*/
 
@@ -71,10 +73,10 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String strEmail = email.getText().toString().trim();
-                String strPass = password.getText().toString().trim();
-                String strUsernm = username.getText().toString();
-                String strFullnm = fullname.getText().toString();
+                final String strEmail = email.getText().toString().trim();
+                final String strPass = password.getText().toString().trim();
+                final String strUsernm = username.getText().toString();
+                final String strFullnm = fullname.getText().toString();
 
                 if (TextUtils.isEmpty(strEmail)){
                     email.setError("Email is Required !");
@@ -91,6 +93,8 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
+                progressBar.setVisibility(View.VISIBLE);
+
 
                 fbAuth.createUserWithEmailAndPassword(strEmail, strPass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -99,6 +103,21 @@ public class RegisterActivity extends AppCompatActivity {
                         if (task.isSuccessful()){
 
                             Toast.makeText(RegisterActivity.this, "User Created ", Toast.LENGTH_SHORT).show();
+
+                            userId = fbAuth.getCurrentUser().getUid();
+                            DocumentReference documentReference = fbFirestore.collection("users").document(userId);
+                            Map<String, Object> user = new HashMap<>();
+                            user.put("userName", strUsernm);
+                            user.put("fullName", strFullnm);
+                            user.put("email", strEmail);
+                            user.put("password", strPass);
+                            documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+
+                                  Log.d("TAG", "onSuccess: user Profile is created for " + userId);
+                                }
+                            });
                             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
 
                         }

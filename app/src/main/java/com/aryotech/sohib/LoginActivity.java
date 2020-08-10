@@ -42,7 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         txt_signup = findViewById(R.id.txt_signup);
 
         fbAuth = FirebaseAuth.getInstance();
-
         txt_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

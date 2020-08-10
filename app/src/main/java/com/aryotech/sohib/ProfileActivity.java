@@ -6,63 +6,33 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ProfileActivity extends AppCompatActivity {
 
     BottomNavigationView bNavigation;
+
+    Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        bNavigation = findViewById(R.id.bottom_nav);
-        bNavigation.setSelectedItemId(R.id.akun_nav);
+        btnLogout = findViewById(R.id.btn_logout);
 
-//        bNavigation.setOnNavigationItemSelectedListener(bNavigationMethod);
-
-       bNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            public void onClick(View v) {
 
-                switch (item.getItemId()){
-                    case R.id.post_nav:
-                        startActivity(new Intent(getApplicationContext(), PostActivity.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-
-                    case R.id.home_nav:
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-
-                    case R.id.akun_nav:
-
-                        return true;
-                }
-                return false;
+                FirebaseAuth.getInstance().signOut();//logout
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             }
         });
+
     }
-
-   /* BottomNavigationView.OnNavigationItemSelectedListener bNavigationMethod = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-            switch (item.getItemId()) {
-                case R.id.home_nav:
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-
-                case R.id.akun_nav:
-
-                    return true;
-            }
-            return false;
-
-        }
-    };*/
 }
