@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "100196888897",
+    "firebase_url": "https://sohib-42589.firebaseio.com",
+    "project_id": "sohib-42589",
+    "storage_bucket": "sohib-42589.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:100196888897:android:f422afb73a622b3386f1c0",
+        "android_client_info": {
+          "package_name": "com.aryotech.sohib"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "100196888897-jfsh9ke1rcqdcv94nlqs6fio28i1rpti.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aryotech.sohib",
+            "certificate_hash": "2e1cd91deb74d6629ae5042f355a286db7da1dfb"
+          }
+        },
+        {
+          "client_id": "100196888897-io9g2ksffhe0379kk10k2hujbjaekjoc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1qT0haNi6hmr6mu1L2tnOCfdZC4ySXa4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "100196888897-io9g2ksffhe0379kk10k2hujbjaekjoc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
