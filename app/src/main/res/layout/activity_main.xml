@@ -8,20 +8,27 @@
     android:gravity="top"
     tools:context=".MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_status"
+    <FrameLayout
+        android:id="@+id/frag_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/status"/>
+        android:layout_above="@+id/bottom"/>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:menu="@menu/navigation"
-        android:background="?android:attr/windowBackground"/>
+        android:layout_alignParentBottom="true">
 
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bottom_nav"
+            app:itemIconTint="@color/selector"
+            app:labelVisibilityMode="unlabeled"
+            app:menu="@menu/navigation"
+            android:background="?android:attr/windowBackground"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
 
 

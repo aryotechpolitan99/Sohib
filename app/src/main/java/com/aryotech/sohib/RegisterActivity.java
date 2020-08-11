@@ -124,20 +124,12 @@ public class RegisterActivity extends AppCompatActivity {
                         else {
 
                             Toast.makeText(RegisterActivity.this, "Error !" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 });
             }
         });
-
-
-
-
-
-
-
-
-
 
 
     }
