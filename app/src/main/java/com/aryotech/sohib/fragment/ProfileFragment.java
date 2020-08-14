@@ -1,6 +1,7 @@
 package com.aryotech.sohib.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aryotech.sohib.LoginActivity;
 import com.aryotech.sohib.model.Users;
 import com.aryotech.sohib.R;
 import com.bumptech.glide.Glide;
@@ -58,6 +60,17 @@ public class ProfileFragment extends Fragment {
         editProfile = view.findViewById(R.id.btn_editprofile);
         myPhotos = view.findViewById(R.id.ib_my_photos);
         savePhotos = view.findViewById(R.id.ib_save_photos);
+        btnLogout = view.findViewById(R.id.btn_logout);
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getContext(), LoginActivity.class));
+                getActivity().finish();
+            }
+        });
 
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override

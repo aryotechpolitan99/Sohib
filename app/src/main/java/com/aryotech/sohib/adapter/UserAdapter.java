@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -70,7 +71,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         holder.fullName.setText(users.getFullName());
 
         Glide.with(context).load(users.getImageUrl()).into(holder.imgUser);
-        isFollowing(users.getIdUsers(), holder.btnFollow, users.getIdUsers());
+        isFollowing(users.getIdUsers(), holder.btnFollow, fbUser.getUid());
 
         if (users.getIdUsers().equals(fbUser.getUid())){
             holder.btnFollow.setVisibility(View.GONE);
@@ -94,15 +95,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         holder.btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (holder.btnFollow.getText().toString().equals("follow")){
+                Toast.makeText(context, "ada", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, holder.btnFollow.getText().toString(), Toast.LENGTH_SHORT).show();
+                if (holder.btnFollow.getText().toString().equalsIgnoreCase("follow")){
 
                     Map<String, Object> dataFollowing = new HashMap<>();
                     dataFollowing.put(users.getIdUsers(), true);
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     db.collection("follow").document(fbUser.getUid())
                             .collection("following").document(users.getIdUsers()).set(dataFollowing);
-
+                    Toast.makeText(context, "ada", Toast.LENGTH_SHORT).show();
                     Map<String, Object> dataFollower = new HashMap<>();
                     dataFollower.put(fbUser.getUid(), true);
                     db.collection("follow").document(users.getIdUsers())
@@ -130,7 +132,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
 
         TextView userName, fullName;
         CircleImageView imgUser;
-        Button btnFollow;
+        public Button btnFollow;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -151,12 +154,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
 
                if (value != null && value.exists()){
 
-                   button.setText("Following");
+                   button.setText("following");
 
                }
                else {
 
-                   button.setText("Follow");
+                   button.setText("follow");
                }
            }
        });

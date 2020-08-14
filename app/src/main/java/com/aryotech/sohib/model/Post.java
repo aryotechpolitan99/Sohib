@@ -3,13 +3,13 @@ package com.aryotech.sohib.model;
 public class Post {
 
     String postId;
-    String postImage;
+    String postimage;
     String description;
     String publisher;
 
     public Post(String postId, String postImage, String description, String publisher) {
         this.postId = postId;
-        this.postImage = postImage;
+        this.postimage = postImage;
         this.description = description;
         this.publisher = publisher;
     }
@@ -25,11 +25,11 @@ public class Post {
     }
 
     public String getPostImage() {
-        return postImage;
+        return postimage;
     }
 
     public void setPostImage(String postImage) {
-        this.postImage = postImage;
+        this.postimage = postImage;
     }
 
     public String getDescription() {
