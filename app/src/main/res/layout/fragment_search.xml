@@ -3,18 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment.SearchFragment">
+    tools:context=".fragment.SearchFragment">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bar_search"
         android:background="?android:attr/windowBackground">
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbar_search"
             android:background="?android:attr/windowBackground">
 
             <ImageView
@@ -36,6 +36,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/rv"
-        android:layout_below="@+id/bar"/>
+        android:id="@+id/rv_search"
+        android:layout_below="@+id/bar_search"/>
+
 </RelativeLayout>

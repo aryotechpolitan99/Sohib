@@ -1,8 +1,7 @@
-package com.aryotech.sohib.Fragment;
+package com.aryotech.sohib.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,8 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.aryotech.sohib.Model.Post;
-import com.aryotech.sohib.Model.Users;
+import com.aryotech.sohib.model.Users;
 import com.aryotech.sohib.R;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,7 +26,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.auth.User;
 
 
 public class ProfileFragment extends Fragment {

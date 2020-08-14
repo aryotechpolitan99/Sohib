@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:padding="8dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/img_user_item"
+        android:id="@+id/img_useritem"
         android:src="@mipmap/ic_launcher"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/img_profil"
+        android:layout_toEndOf="@+id/img_useritem"
         android:layout_marginStart="5dp"
         android:orientation="vertical"
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@+id/img_profil">
+        android:layout_toRightOf="@+id/img_useritem">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/username_item"
+            android:id="@+id/username_useritem"
             android:text="username"
             android:maxLines="1"
             android:textStyle="bold"
@@ -33,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/fullname_item"
+            android:id="@+id/fullname_useritem"
             android:text="fullname"
             android:maxLines="1"/>
 
@@ -42,7 +43,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:id="@+id/btn_follow"
+        android:id="@+id/btn_follow_useritem"
+        android:background="@drawable/button_bg"
         android:textColor="@color/colorPrimary"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"

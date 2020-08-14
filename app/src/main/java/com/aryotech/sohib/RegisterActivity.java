@@ -38,8 +38,8 @@ public class RegisterActivity extends AppCompatActivity {
     ProgressBar progressBar;
 
     FirebaseAuth fbAuth;
-    DatabaseReference dbRef;
     FirebaseFirestore fbFirestore;
+    FirebaseUser fbUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,23 +55,28 @@ public class RegisterActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progbar);
 
         fbFirestore = FirebaseFirestore.getInstance();
+        fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        fbAuth = FirebaseAuth.getInstance();
+
 
         /*if (fbAuth.getCurrentUser() != null){
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             finish();
         }*/
 
-        fbAuth = FirebaseAuth.getInstance();
         txt_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                finish();
             }
         });
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                progressBar.setVisibility(View.VISIBLE);
 
                 final String strEmail = email.getText().toString().trim();
                 final String strPass = password.getText().toString().trim();
@@ -93,8 +98,7 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                progressBar.setVisibility(View.VISIBLE);
-
+                //progressBar.setVisibility(View.VISIBLE);
 
                 fbAuth.createUserWithEmailAndPassword(strEmail, strPass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -107,8 +111,11 @@ public class RegisterActivity extends AppCompatActivity {
                             userId = fbAuth.getCurrentUser().getUid();
                             DocumentReference documentReference = fbFirestore.collection("users").document(userId);
                             Map<String, Object> user = new HashMap<>();
+                            user.put("idUsers", fbUser.getUid());
+                            user.put("imageUrl", "https://firebasestorage.googleapis.com/v0/b/sohib-42589.appspot.com/o/posts%2F1597392445474.null?alt=media&token=7f21af8c-ae85-4013-942f-9e82f6318073");
                             user.put("userName", strUsernm);
                             user.put("fullName", strFullnm);
+                            user.put("bio", "");
                             user.put("email", strEmail);
                             user.put("password", strPass);
                             documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -119,12 +126,15 @@ public class RegisterActivity extends AppCompatActivity {
                                 }
                             });
                             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                            finish();
+
+                            progressBar.setVisibility(View.GONE);
 
                         }
                         else {
 
                             Toast.makeText(RegisterActivity.this, "Error !" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
+                            //progressBar.setVisibility(View.GONE);
                         }
                     }
                 });

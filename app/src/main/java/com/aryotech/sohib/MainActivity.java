@@ -4,21 +4,27 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.aryotech.sohib.Fragment.HomeFragment;
-import com.aryotech.sohib.Fragment.NotifFragment;
-import com.aryotech.sohib.Fragment.ProfileFragment;
-import com.aryotech.sohib.Fragment.SearchFragment;
+import com.aryotech.sohib.adapter.CommentAdapter;
+import com.aryotech.sohib.fragment.HomeFragment;
+import com.aryotech.sohib.fragment.NotifFragment;
+import com.aryotech.sohib.fragment.ProfileFragment;
+import com.aryotech.sohib.fragment.SearchFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
-    BottomNavigationView bNavigation;
-    Fragment fragment;
+    private BottomNavigationView bNavigation;
+    private Fragment fragment;
+
+    public static final String DATA_UID = "PREF_UID";
+    public static final String KEY = "ID_PROFILE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +36,22 @@ public class MainActivity extends AppCompatActivity {
 
         bNavigation.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, fragment).commit();
+        Bundle intent = getIntent().getExtras();
+        if (intent != null){
+
+            String publisher = intent.getString(CommentAdapter.ID_PUBlISHER);
+            SharedPreferences.Editor editor = getSharedPreferences(DATA_UID, MODE_PRIVATE).edit();
+            editor.putString(KEY, publisher);
+            editor.apply();
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new HomeFragment()).commit();
+
+        }
+        else {
+
+            getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new HomeFragment()).commit();
+        }
+
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener
@@ -58,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case R.id.akun_nav:
-                    SharedPreferences.Editor editor = getSharedPreferences("pref", MODE_PRIVATE).edit();
+                    @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = getSharedPreferences(DATA_UID, MODE_PRIVATE).edit();
+                    editor.putString(KEY, FirebaseAuth.getInstance().getCurrentUser().getUid());
                     editor.apply();
                     fragment = new ProfileFragment();
                     break;
@@ -69,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, fragment).commit();
             }
 
-            return false;
+            return true;
         }
     };
 }

@@ -6,10 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
@@ -18,30 +18,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class PostActivity extends AppCompatActivity {
 
-    Uri imgUri;
-    String myUrl = "";
-    StorageTask uploadTask;
-    StorageReference storageRef;
+    private Uri imgUri;
+    private String myUrl = "";
+    private StorageTask uploadTask;
+    private StorageReference storageRef;
 
-    ImageView ivClose, ivImageAdd;
-    TextView post;
-    EditText description;
+    private ImageView ivClose, ivImageAdd;
+    private TextView post;
+    private EditText description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,7 @@ public class PostActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 startActivity(new Intent(PostActivity.this, MainActivity.class));
-                finish();;
+                finish();
             }
         });
 
@@ -76,30 +77,40 @@ public class PostActivity extends AppCompatActivity {
                 .start(PostActivity.this);
     }
 
-    private String getFileExtention(Uri uri){
+    public static String getFileExtention(Context context, Uri uri){
 
-        ContentResolver contentResolver = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+        String extention;
+
+       if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)){
+
+           final MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+           extention = mimeTypeMap.getExtensionFromMimeType(context.getContentResolver().getType(uri));
+
+       }
+       else {
+
+           extention = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
+       }
+        return extention;
 
     }
 
-    private void uploadImage(){
+    private void uploadImage() {
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Posting");
+        progressDialog.setMessage("Upload....");
         progressDialog.show();
 
-        if (imgUri != null){
+        if (imgUri != null) {
 
             final StorageReference fileReff = storageRef.child(System.currentTimeMillis()
-            +"."+ getFileExtention(imgUri));
+                    + "." + getFileExtention(getApplicationContext(), imgUri));
             uploadTask = fileReff.putFile(imgUri);
             uploadTask.continueWithTask(new Continuation() {
                 @Override
                 public Object then(@NonNull Task task) throws Exception {
 
-                    if (!task.isComplete()){
+                    if (!task.isComplete()) {
                         throw task.getException();
                     }
                     return fileReff.getDownloadUrl();
@@ -108,44 +119,57 @@ public class PostActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
 
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         myUrl = downloadUri.toString();
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-
-                        String  postid = reference.push().getKey();
+                        CollectionReference reference = FirebaseFirestore.getInstance().collection("photos");
+                        String idPost = reference.document().getId();
+                        Toast.makeText(PostActivity.this, "id document " + idPost, Toast.LENGTH_SHORT).show();
 
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("postId", postid);
+                        hashMap.put("postId", idPost);
                         hashMap.put("postimage", myUrl);
-                        hashMap.put("description", description.getText().toString());
+                        hashMap.put("description", description.getText().toString().trim());
                         hashMap.put("publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                        reference.child(postid).setValue(hashMap);
+                        reference.document(idPost).set(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
 
-                        progressDialog.dismiss();
+                                if (task.isSuccessful()) {
 
-                        startActivity(new Intent(PostActivity.this, MainActivity.class));
-                        finish();
+                                    progressDialog.dismiss();
+                                    startActivity(new Intent(PostActivity.this, MainActivity.class));
+                                    Toast.makeText(PostActivity.this, "Success upload to database", Toast.LENGTH_SHORT).show();
+                                    finish();
+
+                                } else {
+
+                                    Toast.makeText(PostActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    } else {
+
+                        Toast.makeText(PostActivity.this, "Your dont choose image", Toast.LENGTH_SHORT).show();
                     }
-                    else {
-                        Toast.makeText(PostActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-                    }
+                }
+            }).addOnCanceledListener(new OnCanceledListener() {
+                @Override
+                public void onCanceled() {
+
+                    Toast.makeText(PostActivity.this, "On canceled listener", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
 
-                    Toast.makeText(PostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostActivity.this, "On failure" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
-        else {
-            Toast.makeText(this, "No Image Selected!", Toast.LENGTH_SHORT).show();
-        }
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

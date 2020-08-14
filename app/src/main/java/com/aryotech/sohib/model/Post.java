@@ -1,4 +1,4 @@
-package com.aryotech.sohib.Model;
+package com.aryotech.sohib.model;
 
 public class Post {
 

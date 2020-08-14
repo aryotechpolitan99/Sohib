@@ -1,29 +1,29 @@
-package com.aryotech.sohib.Model;
+package com.aryotech.sohib.model;
 
 public class Users {
 
-    String id;
-    String userName;
-    String fullName;
-    String imageUrl;
-    String bio;
+    private String idUsers;
+    private String userName;
+    private String fullName;
+    private String imageUrl;
+    private String bio;
 
-    public Users(String id, String userName, String fullName, String imageUrl, String bio) {
-
-        this.id = id;
+    public Users(String idUsers, String userName, String fullName, String imageUrl, String bio) {
+        this.idUsers = idUsers;
         this.userName = userName;
         this.fullName = fullName;
         this.imageUrl = imageUrl;
         this.bio = bio;
     }
+
     public Users(){}
 
-    public String getId() {
-        return id;
+    public String getIdUsers() {
+        return idUsers;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setIdUsers(String idUsers) {
+        this.idUsers = idUsers;
     }
 
     public String getUserName() {
