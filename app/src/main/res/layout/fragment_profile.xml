@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
     tools:context=".fragment.ProfileFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -38,9 +37,7 @@
                     android:id="@+id/img_option"
                     android:src="@drawable/option"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="10dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="10dp" />
+                    android:layout_marginEnd="10dp"/>
 
 
             </RelativeLayout>
@@ -52,7 +49,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/scrool_profile">
+        android:layout_below="@id/bar_profile">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,7 +59,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/topbar_prifile"
+                android:id="@+id/topbar_profile"
+                android:orientation="horizontal"
                 android:padding="16dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -108,6 +106,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="35dp"
+                            android:layout_marginStart="10dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -129,7 +128,7 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="35dp"
+                            android:layout_marginStart="10dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -154,7 +153,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/btn_editprofile"
+                        android:text="Edit Profile"
                         android:layout_marginTop="8dp"
+                        android:layout_marginVertical="3dp"
                         android:background="@drawable/button_black_bg"/>
 
                 </LinearLayout>
@@ -217,13 +218,13 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/rv_profile"/>
+                android:id="@+id/rv_myposts_profile"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:id="@+id/rv_save_profile"/>
+                android:id="@+id/rv_postsave_profile"/>
 
         </LinearLayout>
 

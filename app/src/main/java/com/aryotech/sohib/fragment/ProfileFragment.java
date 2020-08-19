@@ -8,6 +8,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aryotech.sohib.LoginActivity;
+import com.aryotech.sohib.MainActivity;
+import com.aryotech.sohib.adapter.PhotoAdapter;
+import com.aryotech.sohib.model.Post;
 import com.aryotech.sohib.model.Users;
 import com.aryotech.sohib.R;
 import com.bumptech.glide.Glide;
@@ -28,17 +34,36 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 
 public class ProfileFragment extends Fragment {
 
-    Button editProfile, btnLogout;
-    ImageView imgProfile, option;
-    TextView posts, followers, following, fullname, bio, userName;
+    private Button editProfile, btnLogout;
+    private ImageView ivImgProfile, ivOption;
+    private TextView tvPosts, tvfollowers, tvFollowing, tvFullname, tvBio, tvUserName;
 
-    FirebaseUser fbUser;
-    String profileId;
-    ImageButton myPhotos, savePhotos;
+    private RecyclerView recyclerView;
+    private List<Post> postList;
+    private PhotoAdapter photoAdapter;
+    private FirebaseUser fbUser;
+    private String profileId;
+    private ImageButton myPhotos, savePhotos;
+
+    public static final String KEY_IMAGE = "idImage";
+    public static final String USER_NAME = "userName";
+
 
     @Nullable
     @Override
@@ -47,20 +72,35 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container,false);
 
         fbUser = FirebaseAuth.getInstance().getCurrentUser();
-        SharedPreferences pref = getContext().getSharedPreferences("PREF", Context.MODE_PRIVATE);
-        profileId = pref.getString("profileid","none");
+        SharedPreferences preferences = Objects.requireNonNull(getContext())
+                .getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE);
+        profileId = preferences.getString(MainActivity.KEY, "none");
 
-        userName = view.findViewById(R.id.tv_usernm_profile);
-        fullname = view.findViewById(R.id.tv_fullname_profile);
-        posts = view.findViewById(R.id.posts);
-        followers = view.findViewById(R.id.followers);
-        following = view.findViewById(R.id.following);
-        imgProfile = view.findViewById(R.id.img_user_profile);
-        option = view.findViewById(R.id.img_option);
+        recyclerView = view.findViewById(R.id.rv_myposts_profile);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 3);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        postList = new ArrayList<>();
+        photoAdapter = new PhotoAdapter(getContext(), postList);
+        recyclerView.setAdapter(photoAdapter);
+
+        tvUserName = view.findViewById(R.id.tv_usernm_profile);
+        tvFullname = view.findViewById(R.id.tv_fullname_profile);
+        tvPosts = view.findViewById(R.id.posts);
+        tvfollowers = view.findViewById(R.id.followers);
+        tvFollowing = view.findViewById(R.id.following);
+        ivImgProfile = view.findViewById(R.id.img_user_profile);
+        ivOption = view.findViewById(R.id.img_option);
         editProfile = view.findViewById(R.id.btn_editprofile);
         myPhotos = view.findViewById(R.id.ib_my_photos);
         savePhotos = view.findViewById(R.id.ib_save_photos);
+        tvBio = view.findViewById(R.id.tv_bio);
         btnLogout = view.findViewById(R.id.btn_logout);
+
+        getUserInfo();
+        getFollowers();
+        getNrPosts();
+        getPhoto();
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,109 +144,119 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    private void userInfo(){
+    private void getUserInfo() {
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users")
-                .child(profileId);
-        reference.addValueEventListener(new ValueEventListener() {
+        DocumentReference reference = FirebaseFirestore.getInstance().collection("users").document(profileId);
+        reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                if (getContext() == null){
+                if (getContext() == null) {
                     return;
+
                 }
 
-                Users user = dataSnapshot.getValue(Users.class);
-
-                Glide.with(getContext()).load(user.getImageUrl()).into(imgProfile);
-                userName.setText(user.getUserName());
-                fullname.setText(user.getFullName());
-                bio.setText(user.getBio());
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                assert value != null;
+                Users users = value.toObject(Users.class);
+                assert users != null;
+                Glide.with(getContext()).load(users.getImageUrl()).into(ivImgProfile);
+                tvUserName.setText(users.getUserName());
+                tvFullname.setText(users.getFullName());
+                tvBio.setText(users.getBio());
 
             }
         });
     }
 
-    private void checkFollow(){
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("Follow").child(fbUser.getUid()).child("following");
+    private void getFollowers() {
 
-        reference.addValueEventListener(new ValueEventListener() {
+        CollectionReference collection1 = FirebaseFirestore.getInstance().collection("follow")
+                .document(profileId).collection("followers");
+        collection1.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                if (dataSnapshot.child(profileId).exists()){
-                    editProfile.setTag("following");
+                List<String> jumlah = new ArrayList<>();
+                assert value != null;
+                for (DocumentSnapshot snapshot : value) {
+
+                    jumlah.add(value.getDocumentChanges().toString());
+
                 }
-                else {
-                    editProfile.setTag("follow");
-                }
+
+                tvfollowers.setText(String.valueOf(jumlah.size()));
+
             }
+        });
 
+        CollectionReference collection2 = FirebaseFirestore.getInstance().collection("follow")
+                .document(profileId).collection("following");
+        collection2.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+
+                List<String> jumlah = new ArrayList<>();
+                assert value != null;
+                for (DocumentSnapshot snapshot : value) {
+
+                    jumlah.add(value.getDocumentChanges().toString());
+
+                }
+
+                tvFollowing.setText(String.valueOf(jumlah.size()));
 
             }
         });
     }
 
-    private void getFollowers(){
+    private void getNrPosts() {
 
-        DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference()
-                .child("Follow").child(profileId).child("followers");
-        ref1.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+    CollectionReference collectionReference = FirebaseFirestore.getInstance().collection("photos");
+    collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        @Override
+        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                followers.setText(""+ dataSnapshot.getChildrenCount());
-            }
+            int i = 0;
+            assert value != null;
+            for (DocumentSnapshot snapshot : value){
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference()
-                .child("Follow").child(profileId).child("following");
-        ref2.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                following.setText(""+ dataSnapshot.getChildrenCount());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getNrPosts(){
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                int i = 0;
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-
+                Post post = snapshot.toObject(Post.class);
+                assert  post != null;
+                if (post.getPublisher().equals(profileId)){
+                    i++;
 
                 }
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            tvPosts.setText(String.valueOf(i));
 
-            }
-        });
+        }
+    });
+
+    }
+
+    private void getPhoto(){
+
+        FirebaseFirestore.getInstance().collection("photos")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+
+                        for (DocumentSnapshot snapshot : value){
+
+                            Post post = snapshot.toObject(Post.class);
+                            if (post.getPublisher().equals(profileId)){
+
+                                postList.add(post);
+
+                            }
+                        }
+
+                        Collections.reverse(postList);
+                        photoAdapter.notifyDataSetChanged();
+
+                    }
+                });
     }
 }
