@@ -41,6 +41,7 @@ public class HomeFragment extends Fragment {
     private PostAdapter postAdapter;
     private List<Post> postList;
     private List<String> followingList;
+    private static final String TAG = "HomeFragment";
 
     @Nullable
     @Override

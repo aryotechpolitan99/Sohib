@@ -7,9 +7,6 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:layout_width="40dp"
-        app:civ_border_color="@color/colorAccent"
-        app:civ_border_width="2dp"
-        app:civ_border_overlay="true"
         android:layout_height="40dp"
         android:id="@+id/circleimg_user_itemcomment" />
 

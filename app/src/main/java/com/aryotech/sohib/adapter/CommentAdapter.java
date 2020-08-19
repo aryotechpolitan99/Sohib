@@ -1,6 +1,7 @@
 package com.aryotech.sohib.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aryotech.sohib.MainActivity;
 import com.aryotech.sohib.R;
 import com.aryotech.sohib.model.Comments;
 import com.aryotech.sohib.model.Users;
@@ -36,9 +38,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     private FirebaseUser fbUser;
 
-    public CommentAdapter(Context context, List<Comments> mComments) {
+    public CommentAdapter(Context context, List<Comments> listcomments) {
         this.context = context;
-        this.listcomments = mComments;
+        this.listcomments = listcomments;
 
     }
 
@@ -57,7 +59,30 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         fbUser = FirebaseAuth.getInstance().getCurrentUser();
         final Comments comment = listcomments.get(position);
 
-        holder.tvCommenters.setText(comment.getMyComment());
+        holder.tvCommenters.setText(comment.getIsComments());
+        getUserInfo(holder.circleImgUserItem, holder.tvCommenters, comment.getCommenters());
+
+        holder.tvCommenters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra(ID_PUBlISHER, comment.getCommenters());
+                context.startActivity(intent);
+
+            }
+        });
+
+        holder.circleImgUserItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra(ID_PUBlISHER, comment.getCommenters());
+                context.startActivity(intent);
+
+            }
+        });
 
     }
 
@@ -68,19 +93,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        public CircleImageView circleImgUserItem;
+        public ImageView circleImgUserItem;
         public TextView tvCommenters, isComments;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            circleImgUserItem = itemView.findViewById(R.id.iv_comment_postitem);
+            circleImgUserItem = itemView.findViewById(R.id.circleimg_user_itemcomment);
             tvCommenters = itemView.findViewById(R.id.tv_username_itemcomment);
             isComments = itemView.findViewById(R.id.tv_comments_itemcomment);
         }
     }
 
-    private void getUserInfo(final CircleImageView circleImgUserItem, final TextView tvCommenters, String publisher){
+    private void getUserInfo(final ImageView circleImgUserItem, final TextView tvCommenters, String publisher){
 
         FirebaseFirestore.getInstance().collection("users").document(publisher)
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -90,7 +115,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         Users users = value.toObject(Users.class);
                         Glide.with(context).load(users.getImageUrl()).into(circleImgUserItem);
                         tvCommenters.setText(users.getUserName());
-
                     }
                 });
     }

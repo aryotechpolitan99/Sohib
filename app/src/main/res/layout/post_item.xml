@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,7 +11,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
@@ -30,6 +30,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:text="username"
+                android:padding="5dp"
                 android:textColor="@color/colorPrimaryDark"/>
 
         </LinearLayout>
@@ -46,28 +47,25 @@
             android:padding="8dp">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/iv_like_postitem"
                 android:src="@drawable/love"/>
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/iv_comment_postitem"
                 android:src="@drawable/comment"
                 android:layout_toEndOf="@+id/iv_like_postitem"
-                android:layout_marginStart="10dp"
-                android:layout_toRightOf="@+id/iv_like_postitem"
-                android:layout_marginLeft="10dp" />
+                android:layout_marginStart="10dp" />
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/iv_save_postitem"
                 android:src="@drawable/save"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentEnd="true"/>
 
         </RelativeLayout>
 
@@ -78,8 +76,7 @@
             android:id="@+id/tv_like_postitem"
             android:textStyle="bold"
             android:text="10 likes"
-            android:textColor="@color/colorPrimaryDark"
-            android:layout_marginLeft="8dp" />
+            android:textColor="@color/colorPrimaryDark" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -88,8 +85,7 @@
             android:id="@+id/tv_publisher_postitem"
             android:textStyle="bold"
             android:text="username"
-            android:textColor="@color/colorPrimaryDark"
-            android:layout_marginLeft="8dp" />
+            android:textColor="@color/colorPrimaryDark" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -98,8 +94,7 @@
             android:id="@+id/tv_descript_postitem"
             android:textStyle="bold"
             android:text="description"
-            android:textColor="@color/colorPrimaryDark"
-            android:layout_marginLeft="8dp" />
+            android:textColor="@color/colorPrimaryDark" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -108,8 +103,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
-            android:text="View all 20 comments"
-            android:layout_marginLeft="8dp" />
+            android:text="View all 20 comments" />
 
     </LinearLayout>
 

@@ -2,22 +2,22 @@ package com.aryotech.sohib.model;
 
 public class Comments {
 
-    private String myComment;
+    private String isComments;
     private String commenters;
 
-    public Comments(String myComment, String commenters) {
-        this.myComment = myComment;
+    public Comments(String isComments, String commenters) {
+        this.isComments = isComments;
         this.commenters = commenters;
     }
 
     public Comments(){}
 
-    public String getMyComment() {
-        return myComment;
+    public String getIsComments() {
+        return isComments;
     }
 
-    public void setMyComment(String myComment) {
-        this.myComment = myComment;
+    public void setIsComments(String myComment) {
+        this.isComments = isComments;
     }
 
     public String getCommenters() {
