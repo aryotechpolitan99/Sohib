@@ -1,6 +1,8 @@
 package com.aryotech.sohib.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,7 +21,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.aryotech.sohib.EditProfileActivity;
 import com.aryotech.sohib.LoginActivity;
 import com.aryotech.sohib.MainActivity;
 import com.aryotech.sohib.adapter.PhotoAdapter;
@@ -29,11 +33,7 @@ import com.aryotech.sohib.R;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,13 +44,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
 public class ProfileFragment extends Fragment {
 
-    private Button editProfile, btnLogout;
+    private Button editProfile;
     private ImageView ivImgProfile, ivOption;
     private TextView tvPosts, tvfollowers, tvFollowing, tvFullname, tvBio, tvUserName;
 
@@ -95,22 +97,12 @@ public class ProfileFragment extends Fragment {
         myPhotos = view.findViewById(R.id.ib_my_photos);
         savePhotos = view.findViewById(R.id.ib_save_photos);
         tvBio = view.findViewById(R.id.tv_bio);
-        btnLogout = view.findViewById(R.id.btn_logout);
 
         getUserInfo();
         getFollowers();
         getNrPosts();
         getPhoto();
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getContext(), LoginActivity.class));
-                getActivity().finish();
-            }
-        });
 
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,24 +112,68 @@ public class ProfileFragment extends Fragment {
 
                 if (btnEdit.equals("Edit Profile")){
 
+                    startActivity(new Intent(getContext(), EditProfileActivity.class));
                 }
                 else if (btnEdit.equals("follow")){
 
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(fbUser.getUid())
-                            .child("following").child(profileId).setValue(true);
+                    Map<String, Object> dataFollowing = new HashMap<>();
+                    dataFollowing.put(profileId,true);
+                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                    firestore.collection("follow").document(fbUser.getUid())
+                            .collection("following").document(fbUser.getUid()).set(dataFollowing);
 
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(profileId)
-                            .child("followers").child(fbUser.getUid()).setValue(true);
+                    Map<String, Object> dataFollowers = new HashMap<>();
+                    dataFollowers.put(fbUser.getUid(), true);
+                    firestore.collection("follow").document(profileId)
+                            .collection("followers").document(fbUser.getUid()).set(dataFollowing);
+
+                    addNotifikasi();
 
                 }
-                else if (btnEdit.equals("following")){
+                else if (btnEdit.equals("unfollow")){
 
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(fbUser.getUid())
-                            .child("following").child(profileId).removeValue();
+                    Map<String,Object> dataFollowing = new HashMap<>();
+                    dataFollowing.put(profileId, true);
+                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                    firestore.collection("follow").document(fbUser.getUid())
+                            .collection("following").document(profileId).delete();
 
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(profileId)
-                            .child("followers").child(fbUser.getUid()).removeValue();
+                    Map<String, Object> dataFollowers = new HashMap<>();
+                    dataFollowers.put(fbUser.getUid(), true);
+                    firestore.collection("follow").document(profileId)
+                            .collection("followers").document(fbUser.getUid()).delete();
+
                 }
+            }
+        });
+
+        ivOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                final AlertDialog.Builder alert = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
+                alert.setTitle("yess..");
+                alert.setCancelable(false);
+                alert.setMessage("are sure you want to log out?");
+                alert.setPositiveButton("logout", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        logout();
+                        Toast.makeText(getContext(), "logout", Toast.LENGTH_SHORT).show();
+
+                    }
+                }).setNegativeButton("canceled", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        dialogInterface.dismiss();
+
+                    }
+                });
+
+                alert.create().show();
+
             }
         });
 
@@ -258,5 +294,30 @@ public class ProfileFragment extends Fragment {
 
                     }
                 });
+    }
+
+    private  void addNotifikasi(){
+
+        DocumentReference reference = FirebaseFirestore.getInstance()
+                .collection("notifikasi").document(profileId);
+        Map<String, Object> dataNotif = new HashMap<>();
+        dataNotif.put("idUser", fbUser.getUid());
+        dataNotif.put("comments", "following you");
+        dataNotif.put("idPost", "");
+        dataNotif.put("isPost", false);
+        reference.set(dataNotif);
+
+    }
+
+    private void logout(){
+
+        FirebaseAuth.getInstance().signOut();
+        FirebaseAuth client = null;
+        client.signOut();
+        Intent intent = new Intent(getContext(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        Objects.requireNonNull(this.getActivity()).finish();
+
     }
 }
