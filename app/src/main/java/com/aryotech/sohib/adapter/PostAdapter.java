@@ -2,6 +2,7 @@ package com.aryotech.sohib.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +11,17 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aryotech.sohib.CommentActivity;
+import com.aryotech.sohib.MainActivity;
+import com.aryotech.sohib.fragment.ProfileFragment;
 import com.aryotech.sohib.model.Post;
 import com.aryotech.sohib.model.Users;
 import com.aryotech.sohib.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -69,7 +74,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         fbUser = FirebaseAuth.getInstance().getCurrentUser();
         final Post post = postList.get(position);
 
-        Glide.with(context).load(post.getPostImage()).into(holder.postImage);
+        Glide.with(context).load(post.getPostImage()).apply(new RequestOptions()
+        .placeholder(R.drawable.status1)).into(holder.postImage);
 
         if (post.getDescription().equals("")){
 
@@ -133,6 +139,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 intent.putExtra(CommentActivity.ID_POST, post.getPostId());
                 intent.putExtra(CommentAdapter.ID_PUBlISHER, post.getPublisher());
                 context.startActivity(intent);
+
+            }
+        });
+
+        holder.imgProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SharedPreferences.Editor editor = context.getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE).edit();
+                editor.putString(MainActivity.KEY, post.getPublisher());
+                editor.apply();
+
+                ((FragmentActivity) context).getSupportFragmentManager()
+                        .beginTransaction().replace(R.id.frag_container, new ProfileFragment()).commit();
+
+            }
+        });
+
+        holder.userName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SharedPreferences.Editor editor = context.getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE).edit();
+                editor.putString(MainActivity.KEY, post.getPublisher());
+                editor.apply();
+
+                ((FragmentActivity) context).getSupportFragmentManager()
+                        .beginTransaction().replace(R.id.frag_container, new ProfileFragment()).commit();
+
+            }
+        });
+
+        holder.publisher.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SharedPreferences.Editor editor = context.getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE).edit();
+                editor.putString(MainActivity.KEY, post.getPublisher());
+                editor.apply();
+
+                ((FragmentActivity) context).getSupportFragmentManager()
+                        .beginTransaction().replace(R.id.frag_container, new ProfileFragment()).commit();
 
             }
         });

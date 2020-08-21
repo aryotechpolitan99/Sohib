@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aryotech.sohib.MainActivity;
 import com.aryotech.sohib.fragment.ProfileFragment;
 import com.aryotech.sohib.model.Users;
 import com.aryotech.sohib.R;
@@ -45,9 +46,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
 
     private FirebaseUser fbUser;
 
-    public UserAdapter(Context context, List<Users> mUsers) {
+    public UserAdapter(Context context, List<Users> listUsers) {
         this.context = context;
-        this.listUsers = mUsers;
+        this.listUsers = listUsers;
     }
 
     @NonNull
@@ -82,8 +83,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
             @Override
             public void onClick(View view) {
 
-                SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("profileId", users.getIdUsers());
+                SharedPreferences.Editor editor = context.getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE).edit();
+                editor.putString(MainActivity.KEY, users.getIdUsers());
                 editor.apply();
 
                 ((FragmentActivity)context).getSupportFragmentManager().beginTransaction()
@@ -95,8 +96,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
         holder.btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "ada", Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, holder.btnFollow.getText().toString(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "ada", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, holder.btnFollow.getText().toString(), Toast.LENGTH_SHORT).show();
                 if (holder.btnFollow.getText().toString().equalsIgnoreCase("follow")){
 
                     Map<String, Object> dataFollowing = new HashMap<>();
@@ -104,12 +105,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     db.collection("follow").document(fbUser.getUid())
                             .collection("following").document(users.getIdUsers()).set(dataFollowing);
-                    Toast.makeText(context, "ada", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "ada", Toast.LENGTH_SHORT).show();
                     Map<String, Object> dataFollower = new HashMap<>();
                     dataFollower.put(fbUser.getUid(), true);
                     db.collection("follow").document(users.getIdUsers())
                             .collection("followers").document(fbUser.getUid()).set(dataFollowing);
 
+                    addNotifikasi(users.getIdUsers());
                 }
                 else {
 
@@ -121,6 +123,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
                 }
             }
         });
+    }
+
+    private void addNotifikasi(String idUser){
+
+        DocumentReference reference = FirebaseFirestore.getInstance().collection("notifikasi").document(idUser);
+        Map<String,Object> dataNotif = new HashMap<>();
+        dataNotif.put("idUser", fbUser.getUid());
+        dataNotif.put("comments","following");
+        dataNotif.put("idPost", "");
+        dataNotif.put("isPost", false);
+        reference.set(dataNotif);
+
     }
 
     @Override
@@ -154,12 +168,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder>{
 
                if (value != null && value.exists()){
 
-                   button.setText("following");
+                   button.setText("unfollow");
+                   button.setBackground(context.getResources().getDrawable(R.drawable.bg_unfollow));
 
                }
                else {
 
                    button.setText("follow");
+                   button.setBackground(context.getResources().getDrawable(R.drawable.button_bg));
                }
            }
        });

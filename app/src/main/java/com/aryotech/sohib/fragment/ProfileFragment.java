@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.aryotech.sohib.EditProfileActivity;
 import com.aryotech.sohib.LoginActivity;
 import com.aryotech.sohib.MainActivity;
+import com.aryotech.sohib.ViewProfileActivity;
 import com.aryotech.sohib.adapter.PhotoAdapter;
 import com.aryotech.sohib.model.Post;
 import com.aryotech.sohib.model.Users;
@@ -69,7 +70,7 @@ public class ProfileFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_profile, container,false);
 
@@ -177,6 +178,32 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        ivImgProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                DocumentReference reference = FirebaseFirestore.getInstance().collection("users").document(profileId);
+                reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+
+                        if (getContext() == null){
+                            return;
+
+                        }
+
+                        Users users = value.toObject(Users.class);
+                        Intent intent = new Intent(getContext(), ViewProfileActivity.class);
+                        intent.putExtra(KEY_IMAGE, users.getImageUrl());
+                        intent.putExtra(USER_NAME, users.getUserName());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+
+                    }
+                });
+            }
+        });
+
         return view;
     }
 
@@ -204,6 +231,31 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+
+    private void cekFollow(){
+
+        CollectionReference collectionReference = FirebaseFirestore.getInstance()
+                .collection("follow").document(fbUser.getUid()).collection("following");
+        collectionReference.document(profileId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+
+                assert value != null;
+                if (value.exists()){
+
+                    editProfile.setText("unfollow");
+                    editProfile.setBackground(getResources().getDrawable(R.drawable.bg_unfollow));
+
+                }
+                else {
+
+                    editProfile.setText("follow");
+                    editProfile.setBackground(getResources().getDrawable(R.drawable.button_bg));
+
+                }
+            }
+        });
+    }
 
     private void getFollowers() {
 

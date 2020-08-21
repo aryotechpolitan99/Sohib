@@ -19,6 +19,7 @@ import com.aryotech.sohib.CommentActivity;
 import com.aryotech.sohib.MainActivity;
 import com.aryotech.sohib.R;
 import com.aryotech.sohib.fragment.PostDetailFragment;
+import com.aryotech.sohib.fragment.ProfileFragment;
 import com.aryotech.sohib.model.Comments;
 import com.aryotech.sohib.model.Notifikasi;
 import com.aryotech.sohib.model.Post;
@@ -78,13 +79,22 @@ public class NotifAdapter extends RecyclerView.Adapter<NotifAdapter.ViewHolder> 
             @Override
             public void onClick(View view) {
 
+                SharedPreferences.Editor editor = context.getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE).edit();
+
                 if (notif.getisPost()){
-                    SharedPreferences.Editor editor = context.getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE).edit();
                     editor.putString(CommentActivity.ID_POST, notif.getIdPost());
                     editor.apply();
 
                     ((FragmentActivity)context).getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frag_container, new PostDetailFragment());
+                            .replace(R.id.frag_container, new PostDetailFragment()).commit();
+                }
+                else {
+                    editor.putString(MainActivity.KEY, notif.getIdUser());
+                    editor.apply();
+
+                    ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frag_container, new ProfileFragment()).commit();
+
                 }
             }
         });
