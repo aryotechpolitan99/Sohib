@@ -61,6 +61,7 @@ public class ProfileFragment extends Fragment {
     private List<Post> postList;
     private PhotoAdapter photoAdapter;
     private FirebaseUser fbUser;
+    private FirebaseUser fbAuth;
     private String profileId;
     private ImageButton myPhotos, savePhotos;
 
@@ -74,6 +75,7 @@ public class ProfileFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_profile, container,false);
 
+        fbAuth = FirebaseAuth.getInstance().getCurrentUser();
         fbUser = FirebaseAuth.getInstance().getCurrentUser();
         SharedPreferences preferences = Objects.requireNonNull(getContext())
                 .getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE);
@@ -153,7 +155,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
 
                 final AlertDialog.Builder alert = new AlertDialog.Builder(Objects.requireNonNull(getContext()));
-                alert.setTitle("yess..");
+                alert.setTitle("Option");
                 alert.setCancelable(false);
                 alert.setMessage("are sure you want to log out?");
                 alert.setPositiveButton("logout", new DialogInterface.OnClickListener() {
