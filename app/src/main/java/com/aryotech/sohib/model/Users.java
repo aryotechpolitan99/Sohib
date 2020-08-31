@@ -1,22 +1,26 @@
 package com.aryotech.sohib.model;
 
+import android.widget.EditText;
+
 public class Users {
 
     private String idUsers;
     private String userName;
     private String fullName;
+    private String password;
     private String imageUrl;
     private String bio;
 
-    public Users(String idUsers, String userName, String fullName, String imageUrl, String bio) {
+    public Users(String idUsers, String userName, String fullName, String password, String imageUrl, String bio) {
         this.idUsers = idUsers;
         this.userName = userName;
         this.fullName = fullName;
+        this.password = password;
         this.imageUrl = imageUrl;
         this.bio = bio;
     }
 
-    public Users(){}
+    public Users () {}
 
     public String getIdUsers() {
         return idUsers;
@@ -40,6 +44,14 @@ public class Users {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getImageUrl() {

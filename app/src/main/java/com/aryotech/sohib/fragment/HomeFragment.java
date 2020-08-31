@@ -32,6 +32,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
@@ -75,17 +76,20 @@ public class HomeFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 
                 postList.clear();
-                for (DocumentSnapshot snapshot : value) {
+                if (value != null){
+                    for (DocumentSnapshot snapshot : value) {
 
-                    Post post = snapshot.toObject(Post.class);
-                    Log.d(TAG, "onEvent : tampil" + snapshot);
-                    Log.d(TAG, "onEvent : postingan" + post);
+                        Post post = snapshot.toObject(Post.class);
+                        Log.d(TAG, "onEvent : tampil" + snapshot);
+                        Log.d(TAG, "onEvent : postingan" + post);
 
-                    for (String id : followingList) {
+                        for (String id : followingList) {
 
-                        if (post.getPublisher().equals(id)) {
-                            postList.add(post);
+                            assert post != null;
+                            if (post.getPublisher().equals(id)) {
+                                postList.add(post);
 
+                            }
                         }
                     }
                 }
@@ -108,12 +112,14 @@ public class HomeFragment extends Fragment {
         reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-
+                Log.d("masuk" ,FirebaseAuth.getInstance().getCurrentUser().getUid());
                 followingList.clear();
-                for (QueryDocumentSnapshot snapshot : value){
+                if (value != null){
+                    for (QueryDocumentSnapshot snapshot : value){
 
-                    followingList.add(snapshot.getId());
+                        followingList.add(snapshot.getId());
 
+                    }
                 }
 
                 displayPost();

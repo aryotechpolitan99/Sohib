@@ -70,11 +70,14 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                Users users = value.toObject(Users.class);
-                etFullname.setText(users.getFullName());
-                etUsername.setText(users.getUserName());
-                etBio.setText(users.getBio());
-                Glide.with(getApplicationContext()).load(users.getImageUrl()).into(ivPp);
+                if (value!= null){
+                    Users users = value.toObject(Users.class);
+                    etFullname.setText(users.getFullName());
+                    etUsername.setText(users.getUserName());
+                    etBio.setText(users.getBio());
+                    Glide.with(getApplicationContext()).load(users.getImageUrl()).into(ivPp);
+                }
+
 
             }
         });
@@ -143,9 +146,9 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void uploadGambar(){
 
-        final ProgressDialog progressDialog = new ProgressDialog(EditProfileActivity.this);
+        /*final ProgressDialog progressDialog = new ProgressDialog(EditProfileActivity.this);
         progressDialog.setTitle("upload on process");
-        progressDialog.show();
+        progressDialog.show();*/
 
         if (imgUri != null){
 

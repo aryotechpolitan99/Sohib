@@ -2,6 +2,7 @@ package com.aryotech.sohib.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,10 +60,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         fbUser = FirebaseAuth.getInstance().getCurrentUser();
         final Comments comment = listcomments.get(position);
 
-        holder.tvCommenters.setText(comment.getIsComments());
+        holder.isComments.setText(comment.getIsComments());
+        Log.d("ada",String.valueOf( comment.getIsComments()));
         getUserInfo(holder.circleImgUserItem, holder.tvCommenters, comment.getCommenters());
 
-        holder.tvCommenters.setOnClickListener(new View.OnClickListener() {
+        holder.isComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 

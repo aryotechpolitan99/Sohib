@@ -146,9 +146,9 @@ public class RegisterActivity extends AppCompatActivity {
         return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
     }
 
-    private void register(final String userName, String pass, final String email, final String fullName){
+    private void register(final String userName, final String fullName, final String email, final String password){
 
-        fbAuth.createUserWithEmailAndPassword(email, pass)
+        fbAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -159,7 +159,7 @@ public class RegisterActivity extends AppCompatActivity {
                             FirebaseUser firebaseUser = fbAuth.getCurrentUser();
                             String idUser = firebaseUser.getUid();
                             String imageUrl = "https://firebasestorage.googleapis.com/v0/b/sohib-42589.appspot.com/o/photos%2F1598004533668.jpg?alt=media&token=d1b24fdc-bfe2-4296-9543-157ddfbeec28";
-                            Users users = new Users(idUser, userName, fullName, imageUrl, "" );
+                            Users users = new Users(idUser, userName, fullName, password, imageUrl,"" );
 
                             fbFirestore = FirebaseFirestore.getInstance();
                             fbFirestore.collection("users").document(idUser)

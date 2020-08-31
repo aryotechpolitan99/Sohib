@@ -146,10 +146,11 @@ public class NotifAdapter extends RecyclerView.Adapter<NotifAdapter.ViewHolder> 
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                assert value != null;
-                Post post = value.toObject(Post.class);
-                assert post != null;
-                Glide.with(context).load(post.getPostImage()).into(photoPost);
+                if (value != null){
+                    Post post = value.toObject(Post.class);
+                    assert post != null;
+                    Glide.with(context).load(post.getPostImage()).into(photoPost);
+                }
 
             }
         });

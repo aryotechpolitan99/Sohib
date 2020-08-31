@@ -9,14 +9,13 @@ public class Comments {
         this.isComments = isComments;
         this.commenters = commenters;
     }
-
-    public Comments(){}
+    public Comments (){}
 
     public String getIsComments() {
         return isComments;
     }
 
-    public void setIsComments(String myComment) {
+    public void setIsComments(String isComments) {
         this.isComments = isComments;
     }
 

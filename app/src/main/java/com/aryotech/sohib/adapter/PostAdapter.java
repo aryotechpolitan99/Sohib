@@ -196,10 +196,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                         int jumlah = 0;
                         String template = "0 menyukai";
-                        if (value.exists()){
-                            jumlah = value.getData().size();
-                            template = jumlah + "menyukai";
+                        if (value != null){
+                            if (value.exists()){
+                                jumlah = value.getData().size();
+                                template = jumlah + "menyukai";
 
+                            }
                         }
 
                         totalLikes.setText(template);
@@ -217,24 +219,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
                 String id = fbUser.getUid();
-                if (value.exists()){
-                    if (value.get(id) != null && value.getBoolean(id)){
-                        postImage.setTag("disukai");
-                        postImage.setImageResource(R.drawable.like_red);
+                if (value != null){
+                    if (value.exists()){
+                        if (value.get(id) != null && value.getBoolean(id)){
+                            postImage.setTag("disukai");
+                            postImage.setImageResource(R.drawable.like_red);
 
+                        }
+                        else {
+
+                            postImage.setTag("sukai");
+                            postImage.setImageResource(R.drawable.like_black);
+
+                        }
                     }
                     else {
 
                         postImage.setTag("sukai");
-                        postImage.setImageResource(R.drawable.like_black);
 
                     }
                 }
-                else {
 
-                    postImage.setTag("sukai");
-
-                }
             }
         });
     }
@@ -248,12 +253,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                 int jumlah = 0;
                 String template = "0 komentar";
-                for (DocumentSnapshot snapshot : value){
+                if (value != null){
+                    for (DocumentSnapshot snapshot : value){
 
-                    if (snapshot.exists()){
-                        jumlah++;
-                        template = jumlah + "komentar";
+                        if (snapshot.exists()){
+                            jumlah++;
+                            template = jumlah + "komentar";
 
+                        }
                     }
                 }
 
@@ -297,13 +304,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                assert  value != null;
-                Users users = value.toObject(Users.class);
-                assert users != null;
+                if (value != null){
+                    Users users = value.toObject(Users.class);
+                    assert users != null;
 
-                Glide.with(context).load(users.getImageUrl()).into(imgProfile);
-                userName.setText(users.getUserName());
-                publisher.setText(users.getUserName());
+                    Glide.with(context).load(users.getImageUrl()).into(imgProfile);
+                    userName.setText(users.getUserName());
+                    publisher.setText(users.getUserName());
+                }
+
             }
         });
     }

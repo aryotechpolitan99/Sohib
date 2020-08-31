@@ -68,11 +68,11 @@ public class LoginActivity extends AppCompatActivity {
         fbAuth = FirebaseAuth.getInstance();
         fbUser = fbAuth.getCurrentUser();
 
-       /* if (fbUser != null){
+       if (fbUser != null){
 
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
-        }*/
+        }
         txt_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -243,7 +243,7 @@ public class LoginActivity extends AppCompatActivity {
                     String fullName = fbAuth.getCurrentUser().getDisplayName();
                     String userName = fbAuth.getCurrentUser().getDisplayName();
                     String imageUrl = "https://firebasestorage.googleapis.com/v0/b/sohib-42589.appspot.com/o/photos%2F1598004533668.jpg?alt=media&token=d1b24fdc-bfe2-4296-9543-157ddfbeec28";
-                    Users users = new Users(idUsers, userName, fullName, imageUrl, "");
+                    Users users = new Users(idUsers, userName, fullName, "", imageUrl, "");
 
                     fbStore.collection("users").document(idUsers).set(users);
                 }

@@ -32,6 +32,9 @@ import com.aryotech.sohib.model.Post;
 import com.aryotech.sohib.model.Users;
 import com.aryotech.sohib.R;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
@@ -61,9 +64,9 @@ public class ProfileFragment extends Fragment {
     private List<Post> postList;
     private PhotoAdapter photoAdapter;
     private FirebaseUser fbUser;
-    private FirebaseUser fbAuth;
     private String profileId;
     private ImageButton myPhotos, savePhotos;
+    private GoogleSignInClient client;
 
     public static final String KEY_IMAGE = "idImage";
     public static final String USER_NAME = "userName";
@@ -75,7 +78,6 @@ public class ProfileFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_profile, container,false);
 
-        fbAuth = FirebaseAuth.getInstance().getCurrentUser();
         fbUser = FirebaseAuth.getInstance().getCurrentUser();
         SharedPreferences preferences = Objects.requireNonNull(getContext())
                 .getSharedPreferences(MainActivity.DATA_UID, Context.MODE_PRIVATE);
@@ -106,6 +108,15 @@ public class ProfileFragment extends Fragment {
         getNrPosts();
         getPhoto();
 
+        if (profileId.equals(fbUser.getUid())){
+            editProfile.setText("Edit Profile");
+
+        }
+        else {
+            cekFollow();
+            savePhotos.setVisibility(View.GONE);
+
+        }
 
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,6 +217,13 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        client = GoogleSignIn.getClient(getContext(), gso);
+
         return view;
     }
 
@@ -221,13 +239,16 @@ public class ProfileFragment extends Fragment {
 
                 }
 
-                assert value != null;
-                Users users = value.toObject(Users.class);
-                assert users != null;
-                Glide.with(getContext()).load(users.getImageUrl()).into(ivImgProfile);
-                tvUserName.setText(users.getUserName());
-                tvFullname.setText(users.getFullName());
-                tvBio.setText(users.getBio());
+                if (value != null){
+
+                    Users users = value.toObject(Users.class);
+                    assert users != null;
+                    Glide.with(getContext()).load(users.getImageUrl()).into(ivImgProfile);
+                    tvUserName.setText(users.getUserName());
+                    tvFullname.setText(users.getFullName());
+                    tvBio.setText(users.getBio());
+                }
+
 
             }
         });
@@ -242,19 +263,21 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                assert value != null;
-                if (value.exists()){
+                if (value != null){
+                    if (value.exists()){
 
-                    editProfile.setText("unfollow");
-                    editProfile.setBackground(getResources().getDrawable(R.drawable.bg_unfollow));
+                        editProfile.setText("unfollow");
+                        editProfile.setBackground(getResources().getDrawable(R.drawable.bg_unfollow));
 
+                    }
+                    else {
+
+                        editProfile.setText("follow");
+                        editProfile.setBackground(getResources().getDrawable(R.drawable.button_bg));
+
+                    }
                 }
-                else {
 
-                    editProfile.setText("follow");
-                    editProfile.setBackground(getResources().getDrawable(R.drawable.button_bg));
-
-                }
             }
         });
     }
@@ -268,11 +291,12 @@ public class ProfileFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 
                 List<String> jumlah = new ArrayList<>();
-                assert value != null;
-                for (DocumentSnapshot snapshot : value) {
+                if (value != null){
+                    for (DocumentSnapshot ignored : value) {
 
-                    jumlah.add(value.getDocumentChanges().toString());
+                        jumlah.add(value.getDocumentChanges().toString());
 
+                    }
                 }
 
                 tvfollowers.setText(String.valueOf(jumlah.size()));
@@ -287,11 +311,12 @@ public class ProfileFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 
                 List<String> jumlah = new ArrayList<>();
-                assert value != null;
-                for (DocumentSnapshot snapshot : value) {
+                if (value != null){
+                    for (DocumentSnapshot ignored : value) {
 
-                    jumlah.add(value.getDocumentChanges().toString());
+                        jumlah.add(value.getDocumentChanges().toString());
 
+                    }
                 }
 
                 tvFollowing.setText(String.valueOf(jumlah.size()));
@@ -366,7 +391,6 @@ public class ProfileFragment extends Fragment {
     private void logout(){
 
         FirebaseAuth.getInstance().signOut();
-        FirebaseAuth client = null;
         client.signOut();
         Intent intent = new Intent(getContext(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
